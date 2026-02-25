@@ -1,0 +1,8 @@
+services:
+  smunsal_web:
+    build: .
+    container_name: smunsal_web
+    ports:
+     - "80:80"
+    volumes:
+     - .:/var/www/html/
