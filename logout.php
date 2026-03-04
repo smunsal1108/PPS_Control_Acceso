@@ -20,7 +20,12 @@ if (isset($_SESSION['nombre'])) {
     
     header('Location: login.php');
 } else {
-    // Si no hay sesión, redirigir con aviso
-    header('Location: login.php?aviso=Debe iniciar sesión para continuar');
+    // Si no hay sesión, guardar aviso en sesión antes de redirigir
+    // Iniciar sesión temporalmente si no hay una para guardar el aviso
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    $_SESSION['aviso'] = 'Debe iniciar sesión para continuar';
+    header('Location: login.php');
 }
 exit;

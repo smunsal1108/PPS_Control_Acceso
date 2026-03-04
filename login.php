@@ -2,20 +2,22 @@
 require_once 'const.php';
 
 // Iniciar sesión solo si ya existe una cookie para no generar cookies innecesarias a visitantes
-if (isset($_COOKIE[session_name()])) {
+// o bien, forzamos iniciarla para poder leer el aviso de la redirección
+if (session_status() === PHP_SESSION_NONE) {
     session_start();
-    // Si ya está logueado, redirigir a principal.php
-    if (isset($_SESSION['nombre'])) {
-        header('Location: principal.php');
-        exit;
-    }
+}
+// Si ya está logueado, redirigir a principal.php
+if (isset($_SESSION['nombre'])) {
+    header('Location: principal.php');
+    exit;
 }
 
 $error_msg = "";
 
-// Verificar si hay avisos en la URL
-if (isset($_GET['aviso'])) {
-    $error_msg = htmlspecialchars($_GET['aviso']);
+// Verificar si hay avisos en la sesión (y borrarlos para que se muestren solo una vez)
+if (isset($_SESSION['aviso'])) {
+    $error_msg = htmlspecialchars($_SESSION['aviso']);
+    unset($_SESSION['aviso']);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

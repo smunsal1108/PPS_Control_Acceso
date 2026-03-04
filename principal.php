@@ -3,7 +3,8 @@ session_start();
 
 // Control de acceso: si no hay sesión, redirigir a login
 if (!isset($_SESSION['nombre'])) {
-    header('Location: login.php?aviso=Debe iniciar sesión para continuar');
+    $_SESSION['aviso'] = 'Debe iniciar sesión para continuar';
+    header('Location: login.php');
     exit;
 }
 
