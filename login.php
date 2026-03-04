@@ -1,6 +1,15 @@
 <?php
 require_once 'const.php';
-session_start();
+
+// Iniciar sesión solo si ya existe una cookie para no generar cookies innecesarias a visitantes
+if (isset($_COOKIE[session_name()])) {
+    session_start();
+    // Si ya está logueado, redirigir a principal.php
+    if (isset($_SESSION['nombre'])) {
+        header('Location: principal.php');
+        exit;
+    }
+}
 
 $error_msg = "";
 
@@ -45,17 +54,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $update_stmt->execute(['password' => $new_hash, 'id' => $user['id']]);
                     }
 
-                    // Iniciar sesión
+                    // Iniciar sesión si no está iniciada
+                    if (session_status() === PHP_SESSION_NONE) {
+                        session_start();
+                    }
+                    session_regenerate_id(true); // Previene fijación de sesión
+                    
                     $_SESSION['nombre'] = $user['nombre'];
                     $_SESSION['rol'] = $user['rol'];
 
                     header('Location: principal.php');
                     exit;
                 } else {
-                    $error_msg = "Credenciales incorrectas";
+                    $error_msg = "Usuario o contraseña incorrectos";
                 }
             } else {
-                $error_msg = "Credenciales incorrectas";
+                $error_msg = "Usuario o contraseña incorrectos";
             }
         } catch (PDOException $e) {
             $error_msg = "Error de conexión: " . $e->getMessage();
@@ -87,8 +101,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="error"><?php echo $error_msg; ?></div>
         <?php endif; ?>
         <form method="POST">
-            <input type="text" name="nombre" placeholder="Nombre de usuario" required>
-            <input type="password" name="password" placeholder="Contraseña" required>
+            <input type="text" name="nombre" placeholder="Nombre de usuario" maxlength="64">
+            <input type="password" name="password" placeholder="Contraseña" maxlength="64">
             <button type="submit">Entrar</button>
         </form>
     </div>
